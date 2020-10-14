@@ -41,6 +41,7 @@ const backstoreOnly = {
  * @param {Object} [option] - Canvas max width & height of css
  *  @param {number} option.cssMaxWidth - Canvas css-max-width
  *  @param {number} option.cssMaxHeight - Canvas css-max-height
+ *  @param {Object} option.options - Options for controlling borders and corners
  *  @param {boolean} option.useDragAddIcon - Use dragable add in icon mode
  * @ignore
  */
@@ -48,8 +49,15 @@ class Graphics {
     constructor(element, {
         cssMaxWidth,
         cssMaxHeight,
+        options,
         useDragAddIcon = false
     } = {}) {
+        /**
+         * Options for controlling borders and corners
+         * @type {Object}
+         */
+        this.options = options;
+
         /**
          * Fabric image instance
          * @type {fabric.Image}
@@ -1086,6 +1094,20 @@ class Graphics {
     _onObjectSelected(fEvent) {
         const {target} = fEvent;
         const params = this.createObjectProperties(target);
+
+        if (this.options) {
+            const props = [
+                'borderColor',
+                'borderScaleFactor',
+                'cornerColor',
+                'cornerSize',
+                'cornerStrokeColor',
+                'cornerStyle'
+            ];
+            for (const prop of props) {
+                target[prop] = this.options[prop] || target[prop];
+            }
+        }
 
         this.fire(events.OBJECT_ACTIVATED, params);
     }
